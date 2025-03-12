@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        let products = [
+            { name: "Laptop", price: 60000 },
+            { name: "Phone", price: 30000 },
+            { name: "Headphones", price: 5000 },
+            { name: "Smartwatch", price: 15000 }
+        ];
+        let selectedProducts = [];
+        let discountPercent = 0;
+
+        function addProduct() {
+            let productSelect = document.getElementById("product");
+            let quantityInput = document.getElementById("quantity");
+            let productIndex = productSelect.selectedIndex;
+            let quantity = parseInt(quantityInput.value);
+
+            if (quantity <= 0) return;
+
+            let product = products[productIndex];
+            selectedProducts.push({ ...product, quantity });
+
+            updateInvoice();
+        }
+
+        function updateInvoice() {
+            let invoiceList = document.getElementById("invoiceList");
+            let totalAmount = document.getElementById("totalAmount");
+            invoiceList.innerHTML = "";
+
+            let total = 0;
+            selectedProducts.forEach((product, index) => {
+                let item = document.createElement("li");
+                item.className = "flex justify-between items-center bg-gray-100 p-2 rounded mb-2";
+                item.innerHTML = `
+                    <span>${product.name} - ₹${product.price} x ${product.quantity} = ₹${product.price * product.quantity}</span>
+                    <button class="text-red-500" onclick="removeProduct(${index})">❌</button>
+                `;
+                total += product.price * product.quantity;
+                invoiceList.appendChild(item);
+            });
+
+            let discountAmount = (total * discountPercent) / 100;
+            total -= discountAmount;
+            totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
+        }
+
+        function removeProduct(index) {
+            selectedProducts.splice(index, 1);
+            updateInvoice();
+        }
+
+        function applyDiscount() {
+            let discountInput = document.getElementById("discount").value;
+            discountPercent = parseFloat(discountInput) || 0;
+            updateInvoice();
+        }
+
+        function generateInvoice() {
+            localStorage.setItem("invoiceProducts", JSON.stringify(selectedProducts));
+            localStorage.setItem("invoiceDiscount", discountPercent);
+            window.location.href = "invoice.html"; 
+        }
+    </script>
+</head>
+<body class="bg-gray-200 min-h-screen flex flex-col items-center p-6">
+    <img src="logo.png" alt="Company Logo" class="w-32 mb-6">
+    <h1 class="text-2xl font-bold mb-4">Invoice Generator</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+        <label class="block font-bold">Choose a Product:</label>
+        <select id="product" class="w-full p-2 border rounded mb-2">
+            <option value="0">Laptop - ₹60000</option>
+            <option value="1">Phone - ₹30000</option>
+            <option value="2">Headphones - ₹5000</option>
+            <option value="3">Smartwatch - ₹15000</option>
+        </select>
+        
+        <label class="block font-bold">Quantity:</label>
+        <input type="number" id="quantity" min="1" value="1" class="w-full p-2 border rounded mb-4">
+
+        <button onclick="addProduct()" class="bg-blue-500 text-white px-4 py-2 rounded w-full">Add Product</button>
+        
+        <h2 class="mt-4 font-bold">Invoice Items:</h2>
+        <ul id="invoiceList" class="mt-2"></ul>
+
+        <div class="mt-4">
+            <label class="block font-bold">Apply Discount (%):</label>
+            <input type="number" id="discount" class="w-full p-2 border rounded mb-2">
+            <button onclick="applyDiscount()" class="bg-green-500 text-white px-4 py-2 rounded w-full">Apply Discount</button>
+        </div>
+
+        <h2 id="totalAmount" class="mt-4 font-bold text-lg">Total: ₹0</h2>
+
+        <button onclick="generateInvoice()" class="mt-4 bg-yellow-500 text-black px-4 py-2 rounded w-full font-bold">Generate Invoice</button>
+    </div>
+</body>
+</html>
