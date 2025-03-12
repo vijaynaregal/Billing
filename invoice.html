@@ -11,11 +11,16 @@
     <script>
         let invoiceData = [];
         let discountPercent = 0;
+        let invoiceDate = "";
 
         function loadInvoice() {
             invoiceData = JSON.parse(localStorage.getItem("invoiceProducts")) || [];
             discountPercent = parseFloat(localStorage.getItem("invoiceDiscount")) || 0;
-            
+
+            const now = new Date();
+            invoiceDate = now.toLocaleString();
+            document.getElementById("invoiceDate").textContent = `Date: ${invoiceDate}`;
+
             let invoiceTable = document.getElementById("invoiceTable");
             invoiceTable.innerHTML = "";
 
@@ -44,13 +49,15 @@
             const doc = new jsPDF();
             doc.setFontSize(16);
             doc.text("Invoice", 15, 10);
-            
+            doc.setFontSize(12);
+            doc.text(`Date: ${invoiceDate}`, 15, 20);
+
             let tableData = invoiceData.map((p) => [p.name, `₹${p.price}`, p.quantity, `₹${p.price * p.quantity}`]);
 
             doc.autoTable({
                 head: [["Product", "Price", "Quantity", "Total"]],
                 body: tableData,
-                startY: 20,
+                startY: 30,
             });
 
             let totalAmount = invoiceData.reduce((sum, p) => sum + p.price * p.quantity, 0);
@@ -68,7 +75,8 @@
 </head>
 <body class="bg-gray-200 flex flex-col items-center p-6">
     <img src="logo.png" alt="Company Logo" class="w-32 mb-6">
-    <h1 class="text-2xl font-bold mb-4">Invoice</h1>
+    <h1 class="text-2xl font-bold mb-2">Invoice</h1>
+    <h2 id="invoiceDate" class="text-lg mb-4 font-semibold"></h2>
 
     <table class="bg-white shadow-md rounded-lg w-full max-w-lg">
         <thead>
