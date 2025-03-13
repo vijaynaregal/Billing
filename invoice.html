@@ -13,7 +13,7 @@
         let discountPercent = 0;
         let invoiceDate = "";
         let invoiceNumber = "";
-        let paymentMethod = "Cash";
+        let paymentMethod = "";
 
         function generateInvoiceNumber() {
             return "INV-" + Math.floor(100000 + Math.random() * 900000);
@@ -53,13 +53,21 @@
 
             let discountAmount = (total * discountPercent) / 100;
             let finalTotal = total - discountAmount;
+            let gstAmount = finalTotal * 0.12;
+            let totalWithGST = finalTotal;
 
             document.getElementById("totalBeforeDiscount").textContent = `Total Before Discount: ₹${total.toFixed(2)}`;
             document.getElementById("discountInfo").textContent = `Discount Applied: ${discountPercent}% (₹${discountAmount.toFixed(2)})`;
-            document.getElementById("finalAmount").textContent = `Total: ₹${finalTotal.toFixed(2)}`;
+            document.getElementById("gstAmount").textContent = `GST (12% Inclusive): ₹${gstAmount.toFixed(2)}`;
+            document.getElementById("finalAmount").textContent = `Total: ₹${totalWithGST.toFixed(2)}`;
         }
 
         function downloadPDF() {
+            if (!paymentMethod) {
+                alert("Please select a payment method before downloading the invoice.");
+                return;
+            }
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -83,10 +91,13 @@
             let totalAmount = invoiceData.reduce((sum, p) => sum + p.price * p.quantity, 0);
             let discountAmount = (totalAmount * discountPercent) / 100;
             let finalAmount = totalAmount - discountAmount;
+            let gstAmount = finalAmount * 0.12;
+            let totalWithGST = finalAmount;
 
             doc.text(`Total Before Discount: ₹${totalAmount.toFixed(2)}`, 15, doc.lastAutoTable.finalY + 10);
             doc.text(`Discount: ${discountPercent}% (₹${discountAmount.toFixed(2)})`, 15, doc.lastAutoTable.finalY + 20);
-            doc.text(`Total After Discount: ₹${finalAmount.toFixed(2)}`, 15, doc.lastAutoTable.finalY + 30);
+            doc.text(`GST (12% Inclusive): ₹${gstAmount.toFixed(2)}`, 15, doc.lastAutoTable.finalY + 30);
+            doc.text(`Total After GST: ₹${totalWithGST.toFixed(2)}`, 15, doc.lastAutoTable.finalY + 40);
 
             doc.save(`${invoiceNumber}.pdf`);
         }
@@ -119,6 +130,7 @@
 
     <h2 id="totalBeforeDiscount" class="mt-4 text-lg font-bold">Total Before Discount: ₹0</h2>
     <h2 id="discountInfo" class="mt-2 text-lg font-bold">Discount: 0%</h2>
+    <h2 id="gstAmount" class="mt-2 text-lg font-bold">GST (12% Inclusive): ₹0</h2>
     <h2 id="finalAmount" class="mt-2 text-lg font-bold">Total: ₹0</h2>
     
     <button onclick="downloadPDF()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded font-bold">Download PDF</button>
