@@ -1,140 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        let products = [
-            { name: "Bedsheet DK", price: 3300 },
-            { name: "Bedsheet K", price: 3000 },
-            { name: "Bedsheet Queen", price: 2300 },
-            { name: "Bedsheet Single", price: 1400 },
-            { name: "Cushion Cover 12X12", price: 220 },
-            { name: "Cushion Cover 12X12", price: 250 },
-            { name: "Cushion Cover 12X18", price: 225 },
-            { name: "Cushion Cover 12X18", price: 500 },
-            { name: "Cushion Cover 16X16", price: 325 },
-            { name: "Cushion Cover 16X16", price: 375 },
-            { name: "Cushion Cover 16X16", price: 425 },
-            { name: "Runner", price: 700 },
-            { name: "Runner", price: 900 },
-            { name: "Tablemats", price: 600 },
-            { name: "Tablemats", price: 1000 },
-            { name: "Coasters (Pair)", price: 300 },
-            { name: "Pouch", price: 450 },
-            { name: "Pillow Cover", price: 300 },
-            { name: "Runner", price: 400 },
-            { name: "Table cloth S", price: 600 },
-            { name: "Table cloth L", price: 1200 },
-            { name: "Book mark", price: 50 }
-        ];
-        let selectedProducts = [];
-        let discountPercent = 0;
-
-        function addProduct() {
-            let productSelect = document.getElementById("product");
-            let quantityInput = document.getElementById("quantity");
-            let productIndex = productSelect.selectedIndex;
-            let quantity = parseInt(quantityInput.value);
-
-            if (quantity <= 0) return;
-
-            let product = products[productIndex];
-            selectedProducts.push({ ...product, quantity });
-
-            updateInvoice();
-        }
-
-        function updateInvoice() {
-            let invoiceList = document.getElementById("invoiceList");
-            let totalAmount = document.getElementById("totalAmount");
-            invoiceList.innerHTML = "";
-
-            let total = 0;
-            selectedProducts.forEach((product, index) => {
-                let item = document.createElement("li");
-                item.className = "flex justify-between items-center bg-gray-100 p-2 rounded mb-2";
-                item.innerHTML = `
-                    <span>${product.name} - ₹${product.price} x ${product.quantity} = ₹${product.price * product.quantity}</span>
-                    <button class="text-red-500" onclick="removeProduct(${index})">❌</button>
-                `;
-                total += product.price * product.quantity;
-                invoiceList.appendChild(item);
-            });
-
-            let discountAmount = (total * discountPercent) / 100;
-            total -= discountAmount;
-            totalAmount.textContent = `Total: ₹${total.toFixed(2)}`;
-        }
-
-        function removeProduct(index) {
-            selectedProducts.splice(index, 1);
-            updateInvoice();
-        }
-
-        function applyDiscount() {
-            let discountInput = document.getElementById("discount").value;
-            discountPercent = parseFloat(discountInput) || 0;
-            updateInvoice();
-        }
-
-        function generateInvoice() {
-            localStorage.setItem("invoiceProducts", JSON.stringify(selectedProducts));
-            localStorage.setItem("invoiceDiscount", discountPercent);
-            window.location.href = "invoice.html"; 
-        }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Atha Decor — Invoice Generator</title>
+  <meta name="description" content="Landing page for Atha Decor's GST-inclusive invoice generator."/>
+  <link rel="icon" href="data:,">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-200 min-h-screen flex flex-col items-center p-6">
-    <img src="logo.png" alt="Company Logo" class="w-32 mb-6">
-    <h1 class="text-2xl font-bold mb-4">Invoice Generator</h1>
-
-    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
-        <label class="block font-bold">Choose a Product:</label>
-        <select id="product" class="w-full p-2 border rounded mb-2">
-            <option value="0">Bedsheet DK - ₹3300</option>
-            <option value="1">Bedsheet K - ₹3000</option>
-            <option value="2">Bedsheet Queen - ₹2300</option>
-            <option value="3">Bedsheet Single - ₹1400</option>
-            <option value="4">Cushion Cover 12X12 - ₹220 </option>
-            <option value="5">Cushion Cover 12X12 - ₹250 </option>
-            <option value="6">Cushion Cover 12X18 - ₹225 </option>
-            <option value="7">Cushion Cover 12X18 - ₹500 </option>
-            <option value="8">Cushion Cover 16X16 - ₹325 </option>
-            <option value="9">Cushion Cover 16X16 - ₹375 </option>
-            <option value="10">Cushion Cover 16X16 - ₹425 </option>
-            <option value="11">Runner - ₹700</option>
-            <option value="12">Runner - ₹900</option>
-            <option value="13">Table Mats - ₹600</option>
-            <option value="14">Table Mats - ₹1000</option>
-            <option value="15">Coasters (Pair) - ₹300</option>
-            <option value="16">Pouch - ₹450</option>
-            <option value="17">Pillow Cover - ₹300 </option>
-            <option value="18">Runner - ₹400 </option>
-            <option value="19">Table cloth S - ₹600 </option>
-            <option value="20">Table cloth L - ₹1200 </option>
-            <option value="21">Book mark - ₹50 </option>
-        </select>
-        
-        <label class="block font-bold">Quantity:</label>
-        <input type="number" id="quantity" min="1" value="1" class="w-full p-2 border rounded mb-4">
-
-        <button onclick="addProduct()" class="bg-blue-500 text-white px-4 py-2 rounded w-full">Add Product</button>
-        
-        <h2 class="mt-4 font-bold">Invoice Items:</h2>
-        <ul id="invoiceList" class="mt-2"></ul>
-
-        <div class="mt-4">
-            <label class="block font-bold">Apply Discount (%):</label>
-            <input type="number" id="discount" class="w-full p-2 border rounded mb-2">
-            <button onclick="applyDiscount()" class="bg-green-500 text-white px-4 py-2 rounded w-full">Apply Discount</button>
-        </div>
-
-        <h2 id="totalAmount" class="mt-4 font-bold text-lg">Total: ₹0</h2>
-
-        <button onclick="generateInvoice()" class="mt-4 bg-yellow-500 text-black px-4 py-2 rounded w-full font-bold">Generate Invoice</button>
+<body class="min-h-screen bg-gray-100 text-gray-900">
+  <header class="bg-white shadow">
+    <div class="max-w-5xl mx-auto px-4 py-6 flex items-center justify-between">
+      <h1 class="text-2xl font-bold">Atha Decor</h1>
+      <nav class="space-x-2">
+        <a href="invoice_generator.html"
+           class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+          Open Invoice Generator
+        </a>
+      </nav>
     </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4">
+    <!-- Hero -->
+    <section class="mt-8 bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold">GST-Inclusive Invoice Generator</h2>
+      <p class="mt-2 text-gray-700">
+        Create invoices with GST treated as inclusive:
+        5% when unit price is below ₹2500 and 18% when unit price is ₹2500 or more.
+        Optional discount can be toggled and applied as a custom percentage before GST breakdown.
+      </p>
+
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <a href="invoice_generator.html"
+           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+          Launch Full Page
+        </a>
+
+        <button id="embedToggle"
+                class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded shadow">
+          Toggle Embedded View
+        </button>
+      </div>
+
+      <ul class="mt-4 list-disc pl-5 text-gray-700">
+        <li>Add products with name, unit price (GST-inclusive), and quantity.</li>
+        <li>Choose payment method (Cash or Online).</li>
+        <li>Enable discount and set a custom percentage if needed.</li>
+        <li>Download the PDF invoice. If the download doesn’t start, check your browser’s popup/download settings.</li>
+      </ul>
+    </section>
+
+    <!-- Embedded App -->
+    <section class="mt-8">
+      <div id="embedWrap" class="hidden border rounded-lg overflow-hidden shadow bg-white">
+        <iframe
+          id="invoiceFrame"
+          src="invoice_generator.html"
+          title="Invoice Generator"
+          class="w-full"
+          style="height: 80vh;"
+        ></iframe>
+        <div class="p-3 bg-gray-50 border-t text-sm text-gray-600">
+          If the embedded view doesn’t load, use the Launch Full Page button above.
+        </div>
+      </div>
+    </section>
+
+    <!-- Helpful notes -->
+    <section class="mt-8 mb-12 text-sm text-gray-600">
+      <h3 class="font-semibold mb-2">Notes</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li>Ensure invoice_generator.html is in the same directory as this index.html.</li>
+        <li>Some browsers block file downloads or popups; allow downloads for this page if prompted.</li>
+        <li>For best results, serve these files over a local server (e.g., using VS Code Live Server or python -m http.server).</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const toggleBtn = document.getElementById("embedToggle");
+    const embedWrap = document.getElementById("embedWrap");
+
+    toggleBtn.addEventListener("click", () => {
+      const isHidden = embedWrap.classList.contains("hidden");
+      embedWrap.classList.toggle("hidden", !isHidden);
+      toggleBtn.textContent = isHidden ? "Hide Embedded View" : "Toggle Embedded View";
+    });
+  </script>
 </body>
 </html>
